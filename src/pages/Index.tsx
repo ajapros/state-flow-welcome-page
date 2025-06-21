@@ -15,7 +15,7 @@ const Index = () => {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Cpu className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">StateMachine</span>
+              <span className="text-xl font-bold text-gray-900">Finito</span>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
@@ -31,17 +31,17 @@ const Index = () => {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <Badge className="mb-6 bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200">
-            ✨ Now with TypeScript support
+            ☕ Java-powered state machines
           </Badge>
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in">
-            Build Reliable Apps with
+            Build Reliable Java Apps with
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent block mt-2">
-              State Machines
+              Finito State Machines
             </span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Create predictable, maintainable applications with our powerful state machine framework. 
-            Eliminate bugs, improve testing, and make complex logic simple.
+            Create predictable, maintainable Java applications with our powerful state machine framework. 
+            Eliminate bugs, improve testing, and make complex business logic simple with type-safe state management.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
@@ -61,10 +61,10 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Why Choose Our Framework?
+              Why Choose Finito for Java?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Built for modern developers who demand reliability, performance, and maintainability.
+              Built specifically for Java developers who demand enterprise-grade reliability, performance, and maintainability.
             </p>
           </div>
           
@@ -74,9 +74,9 @@ const Index = () => {
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <Zap className="w-6 h-6 text-blue-600" />
                 </div>
-                <CardTitle>Lightning Fast</CardTitle>
+                <CardTitle>Enterprise Performance</CardTitle>
                 <CardDescription>
-                  Optimized for performance with minimal runtime overhead and efficient state transitions.
+                  Optimized for JVM performance with minimal memory footprint and efficient state transitions for high-throughput applications.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -86,9 +86,9 @@ const Index = () => {
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
                   <Shield className="w-6 h-6 text-green-600" />
                 </div>
-                <CardTitle>Type Safe</CardTitle>
+                <CardTitle>Type Safe & Robust</CardTitle>
                 <CardDescription>
-                  Full TypeScript support with compile-time guarantees for state transitions and actions.
+                  Full compile-time type safety with Java generics, ensuring state transitions and actions are validated at build time.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -98,9 +98,9 @@ const Index = () => {
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
                   <GitBranch className="w-6 h-6 text-purple-600" />
                 </div>
-                <CardTitle>Visual Debugging</CardTitle>
+                <CardTitle>Spring Integration</CardTitle>
                 <CardDescription>
-                  Built-in state visualization tools for easy debugging and understanding of complex flows.
+                  Seamlessly integrates with Spring Boot and Spring Framework with dependency injection and configuration support.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -113,28 +113,28 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Simple. Powerful. Elegant.
+              Simple. Powerful. Java.
             </h2>
             <p className="text-xl text-blue-200 max-w-3xl mx-auto">
-              Define complex state logic with clean, declarative syntax.
+              Define complex state logic with clean, type-safe Java syntax.
             </p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h3 className="text-2xl font-bold text-white mb-6">Create a state machine in seconds</h3>
+              <h3 className="text-2xl font-bold text-white mb-6">Create a state machine in Java</h3>
               <div className="space-y-4 text-blue-200">
                 <div className="flex items-center">
                   <ArrowRight className="w-5 h-5 mr-3 text-blue-400" />
-                  <span>Define states and transitions declaratively</span>
+                  <span>Define states and transitions with Java enums</span>
                 </div>
                 <div className="flex items-center">
                   <ArrowRight className="w-5 h-5 mr-3 text-blue-400" />
-                  <span>Handle side effects with actions and guards</span>
+                  <span>Handle side effects with type-safe actions</span>
                 </div>
                 <div className="flex items-center">
                   <ArrowRight className="w-5 h-5 mr-3 text-blue-400" />
-                  <span>Visualize and debug your state logic</span>
+                  <span>Integrate with Spring and JPA seamlessly</span>
                 </div>
               </div>
             </div>
@@ -142,27 +142,37 @@ const Index = () => {
             <Card className="bg-gray-800 border-gray-700">
               <CardContent className="p-6">
                 <pre className="text-sm text-green-400 overflow-x-auto">
-                  <code>{`import { createMachine } from 'statemachine';
-
-const toggleMachine = createMachine({
-  id: 'toggle',
-  initial: 'inactive',
-  states: {
-    inactive: {
-      on: {
-        TOGGLE: 'active'
-      }
-    },
-    active: {
-      on: {
-        TOGGLE: 'inactive'
-      }
+                  <code>{`@Component
+public class OrderStateMachine {
+    
+    public enum State {
+        PENDING, PROCESSING, SHIPPED, DELIVERED
     }
-  }
-});
-
-// Use in your app
-const [state, send] = useMachine(toggleMachine);`}</code>
+    
+    public enum Event {
+        PROCESS, SHIP, DELIVER, CANCEL
+    }
+    
+    @Autowired
+    private OrderService orderService;
+    
+    public StateMachine<State, Event> build() {
+        return StateMachineBuilder
+            .<State, Event>create()
+            .initialState(State.PENDING)
+            .transition()
+                .from(State.PENDING)
+                .to(State.PROCESSING)
+                .on(Event.PROCESS)
+                .action(this::processOrder)
+            .and()
+            .transition()
+                .from(State.PROCESSING)
+                .to(State.SHIPPED)
+                .on(Event.SHIP)
+            .build();
+    }
+}`}</code>
                 </pre>
               </CardContent>
             </Card>
@@ -178,7 +188,7 @@ const [state, send] = useMachine(toggleMachine);`}</code>
               See It In Action
             </h2>
             <p className="text-xl text-gray-600">
-              Interactive state diagram of a simple traffic light system
+              Interactive state diagram of an order processing system
             </p>
           </div>
 
@@ -187,20 +197,23 @@ const [state, send] = useMachine(toggleMachine);`}</code>
               <CardContent className="p-8">
                 <div className="flex justify-center items-center space-x-8">
                   <div className="flex flex-col items-center space-y-4">
-                    <div className="w-20 h-20 rounded-full bg-red-500 shadow-lg flex items-center justify-center">
-                      <span className="text-white font-bold">RED</span>
+                    <div className="w-20 h-20 rounded-full bg-orange-500 shadow-lg flex items-center justify-center">
+                      <span className="text-white font-bold text-xs">PENDING</span>
+                    </div>
+                    <div className="w-20 h-20 rounded-full bg-blue-200 shadow-lg flex items-center justify-center">
+                      <span className="text-gray-500 font-bold text-xs">PROCESS</span>
                     </div>
                     <div className="w-20 h-20 rounded-full bg-yellow-200 shadow-lg flex items-center justify-center">
-                      <span className="text-gray-500 font-bold">YELLOW</span>
+                      <span className="text-gray-500 font-bold text-xs">SHIPPED</span>
                     </div>
                     <div className="w-20 h-20 rounded-full bg-green-200 shadow-lg flex items-center justify-center">
-                      <span className="text-gray-500 font-bold">GREEN</span>
+                      <span className="text-gray-500 font-bold text-xs">DELIVERED</span>
                     </div>
                   </div>
                   <div className="flex-1 text-center">
-                    <p className="text-lg text-gray-600 mb-6">Current State: <span className="font-bold text-red-600">RED</span></p>
+                    <p className="text-lg text-gray-600 mb-6">Current State: <span className="font-bold text-orange-600">PENDING</span></p>
                     <Button className="bg-blue-600 hover:bg-blue-700">
-                      Next State
+                      Process Order
                     </Button>
                   </div>
                 </div>
@@ -214,10 +227,10 @@ const [state, send] = useMachine(toggleMachine);`}</code>
       <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Ready to Build Better Apps?
+            Ready to Build Better Java Apps?
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-            Join thousands of developers who trust our state machine framework for their most critical applications.
+            Join thousands of Java developers who trust Finito for their most critical enterprise applications.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
@@ -240,10 +253,10 @@ const [state, send] = useMachine(toggleMachine);`}</code>
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                   <Cpu className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-bold">StateMachine</span>
+                <span className="text-xl font-bold">Finito</span>
               </div>
               <p className="text-gray-400">
-                The most developer-friendly state machine framework for modern applications.
+                The most developer-friendly Java state machine framework for enterprise applications.
               </p>
             </div>
             <div>
@@ -251,7 +264,7 @@ const [state, send] = useMachine(toggleMachine);`}</code>
               <ul className="space-y-2 text-gray-400">
                 <li><a href="#" className="hover:text-white transition-colors">Getting Started</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">API Reference</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Examples</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Spring Integration</a></li>
               </ul>
             </div>
             <div>
@@ -259,7 +272,7 @@ const [state, send] = useMachine(toggleMachine);`}</code>
               <ul className="space-y-2 text-gray-400">
                 <li><a href="#" className="hover:text-white transition-colors">GitHub</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Discord</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Twitter</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Stack Overflow</a></li>
               </ul>
             </div>
             <div>
@@ -267,12 +280,12 @@ const [state, send] = useMachine(toggleMachine);`}</code>
               <ul className="space-y-2 text-gray-400">
                 <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Tutorials</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Enterprise Support</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 StateMachine. All rights reserved.</p>
+            <p>&copy; 2024 Finito. All rights reserved.</p>
           </div>
         </div>
       </footer>
