@@ -1,8 +1,8 @@
-
 import { ArrowRight, Zap, GitBranch, Shield, Cpu, Play, Code2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import CodeExamples from "@/components/CodeExamples";
 
 const Index = () => {
   return (
@@ -108,77 +108,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Code Example Section */}
-      <section id="examples" className="py-20 bg-gradient-to-br from-gray-900 to-blue-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Simple. Powerful. Java.
-            </h2>
-            <p className="text-xl text-blue-200 max-w-3xl mx-auto">
-              Define complex state logic with clean, type-safe Java syntax.
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h3 className="text-2xl font-bold text-white mb-6">Create a state machine in Java</h3>
-              <div className="space-y-4 text-blue-200">
-                <div className="flex items-center">
-                  <ArrowRight className="w-5 h-5 mr-3 text-blue-400" />
-                  <span>Define states and transitions with Java enums</span>
-                </div>
-                <div className="flex items-center">
-                  <ArrowRight className="w-5 h-5 mr-3 text-blue-400" />
-                  <span>Handle side effects with type-safe actions</span>
-                </div>
-                <div className="flex items-center">
-                  <ArrowRight className="w-5 h-5 mr-3 text-blue-400" />
-                  <span>Integrate with Spring and JPA seamlessly</span>
-                </div>
-              </div>
-            </div>
-
-            <Card className="bg-gray-800 border-gray-700">
-              <CardContent className="p-6">
-                <pre className="text-sm text-green-400 overflow-x-auto">
-                  <code>{`@Component
-public class OrderStateMachine {
-    
-    public enum State {
-        PENDING, PROCESSING, SHIPPED, DELIVERED
-    }
-    
-    public enum Event {
-        PROCESS, SHIP, DELIVER, CANCEL
-    }
-    
-    @Autowired
-    private OrderService orderService;
-    
-    public StateMachine<State, Event> build() {
-        return StateMachineBuilder
-            .<State, Event>create()
-            .initialState(State.PENDING)
-            .transition()
-                .from(State.PENDING)
-                .to(State.PROCESSING)
-                .on(Event.PROCESS)
-                .action(this::processOrder)
-            .and()
-            .transition()
-                .from(State.PROCESSING)
-                .to(State.SHIPPED)
-                .on(Event.SHIP)
-            .build();
-    }
-}`}</code>
-                </pre>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+      {/* Code Examples Section - Now using the new component */}
+      <CodeExamples />
 
       {/* Interactive Demo Section */}
       <section className="py-20 bg-white">
