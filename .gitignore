@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# FUSE mount artifacts
+.fuse_hidden*
