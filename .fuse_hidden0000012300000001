@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finito — the Chenile state machine for Java</title>
+<meta name="description" content="Finito is a lightweight, XML-driven finite state machine for Java. Define workflows declaratively, generate a full service with jgen, and get Mermaid and PlantUML state diagrams automatically. Part of the Chenile group — usable standalone.">
+<meta name="theme-color" content="#0b1120">
+<meta property="og:title" content="Finito — the Chenile state machine">
+<meta property="og:description" content="XML-driven finite state machine for Java, with automatic Mermaid + PlantUML diagrams and a code generator. Part of Chenile — works standalone.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;850&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#14b8a6; --teal-deep:#0d9488; --teal-light:#2dd4bf;
+  --amber:#f89038; --amber-deep:#e0801e;      /* Chenile group accent */
+  --ink:#0b1120; --ink-2:#131b2e; --ink-3:#1c273f;
+  --slate:#475569; --muted:#8a94a6; --line:#e6eaf0; --paper:#fff;
+  --soft:#f5f8fa; --soft-2:#e9fbf7; --code-bg:#0f1729;
+  --grad:linear-gradient(135deg,#0d9488 0%,#14b8a6 50%,#2dd4bf 100%);
+  --grad-amber:linear-gradient(135deg,#e0801e,#f89038);
+  --shadow-sm:0 1px 2px rgba(11,17,32,.06),0 2px 8px rgba(11,17,32,.05);
+  --shadow-md:0 10px 30px rgba(11,17,32,.10);
+  --shadow-lg:0 24px 60px rgba(13,148,136,.20);
+  --radius:16px; --maxw:1120px;
+  --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--paper);line-height:1.65;font-size:17px;-webkit-font-smoothing:antialiased}
+a{color:var(--teal-deep);text-decoration:none}a:hover{text-decoration:underline}
+img{max-width:100%}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.narrow{max-width:860px;margin:0 auto;padding:0 24px}
+h1,h2,h3,h4{line-height:1.15;letter-spacing:-.02em;font-weight:800;margin-top:0}
+h1{font-size:clamp(2.2rem,5.4vw,3.6rem)}
+h2{font-size:clamp(1.6rem,3.4vw,2.3rem)}
+h3{font-size:1.22rem;font-weight:750}
+p{margin:0 0 1rem}
+.eyebrow{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-deep);background:var(--soft-2);padding:6px 12px;border-radius:999px;margin-bottom:16px}
+.lead{font-size:1.2rem;color:var(--slate)}
+code{font-family:var(--mono);background:var(--soft-2);color:var(--teal-deep);padding:2px 6px;border-radius:6px;font-size:.86em}
+pre{background:var(--code-bg);color:#e6ecf7;padding:20px 22px;border-radius:14px;overflow-x:auto;font-size:.86rem;line-height:1.6;margin:0}
+pre code{background:none;color:inherit;padding:0}
+.tok-tag{color:#7dd3fc}.tok-attr{color:#fcd34d}.tok-str{color:#86efac}.tok-cm{color:#64748b}.tok-kw{color:#f9a8d4}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:650;font-size:1rem;padding:13px 24px;border-radius:999px;border:1px solid transparent;cursor:pointer;transition:transform .15s,box-shadow .2s}
+.btn:hover{text-decoration:none;transform:translateY(-2px)}
+.btn-primary{background:var(--grad);color:#fff;box-shadow:0 10px 24px rgba(13,148,136,.35)}
+.btn-ghost{background:#fff;color:var(--ink);border-color:var(--line);box-shadow:var(--shadow-sm)}
+.btn-light{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.3)}
+.btn-light:hover{background:rgba(255,255,255,.2)}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(11,17,32,.85);backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid rgba(255,255,255,.08)}
+.nav-inner{display:flex;align-items:center;gap:22px;height:64px}
+.brand{display:flex;align-items:center;gap:11px;color:#fff;font-weight:800;font-size:1.2rem;letter-spacing:-.02em}
+.brand:hover{text-decoration:none}
+.logo-mark{width:30px;height:30px;flex:none}
+.brand .grp{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0b1120;background:var(--amber);padding:3px 7px;border-radius:999px;margin-left:2px}
+.nav-links{display:flex;align-items:center;gap:4px;margin-left:auto}
+.nav-links a{color:#c7d0de;font-weight:600;font-size:.93rem;padding:8px 12px;border-radius:8px}
+.nav-links a:hover{color:#fff;background:rgba(255,255,255,.08);text-decoration:none}
+.nav-cta{background:var(--grad);color:#fff !important;border-radius:999px !important;padding:9px 18px !important}
+@media(max-width:820px){.nav-links a:not(.nav-cta){display:none}}
+
+/* hero */
+.hero{position:relative;background:var(--ink);color:#fff;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(60% 80% at 12% 0%,rgba(20,184,166,.35),transparent 60%),
+  radial-gradient(55% 70% at 92% 15%,rgba(45,212,191,.28),transparent 60%),
+  radial-gradient(50% 60% at 78% 100%,rgba(248,144,56,.16),transparent 60%)}
+.hero-inner{position:relative;padding:84px 24px 76px;text-align:center}
+.hero h1{color:#fff;max-width:16ch;margin:0 auto 18px}
+.hero h1 .g{background:linear-gradient(90deg,#5eead4,#99f6e4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .lead{color:#c7d0de;max-width:60ch;margin:0 auto 26px;font-size:1.25rem}
+.hero .eyebrow{background:rgba(255,255,255,.1);color:#5eead4}
+.badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 28px}
+.badge{font-size:.8rem;font-weight:650;color:#c7d0de;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);padding:7px 14px;border-radius:999px}
+.badge b{color:#fff}
+.badge.amber{border-color:rgba(248,144,56,.5);color:#ffd9ad}
+.hero-actions{display:flex;gap:13px;justify-content:center;flex-wrap:wrap}
+.hero-note{margin-top:18px;font-family:var(--mono);font-size:.85rem;color:#8a94a6}
+
+/* sections */
+section{padding:82px 0}
+.section-head{text-align:center;max-width:760px;margin:0 auto 48px}
+.section-head .lead{margin-top:10px}
+.bg-soft{background:var(--soft)}
+.bg-ink{background:var(--ink);color:#fff}
+.bg-ink h2{color:#fff}.bg-ink .lead{color:#c7d0de}
+.bg-ink .eyebrow{background:rgba(255,255,255,.1);color:#5eead4}
+
+/* feature grid */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.card .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:1.4rem;background:var(--soft-2)}
+.card h3{margin:14px 0 8px}.card p{color:var(--slate);margin:0;font-size:.97rem}
+
+/* ===== HTML STATE-DIAGRAM SCHEMATIC ===== */
+.fsm{--gap:20px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:34px 26px;box-shadow:var(--shadow-md);overflow-x:auto}
+.fsm-legend{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:26px;font-size:.82rem;color:var(--muted)}
+.fsm-legend span{display:inline-flex;align-items:center;gap:7px}
+.dot{width:13px;height:13px;border-radius:4px;display:inline-block}
+.dot.start{border-radius:50%;background:var(--ink)}
+.dot.manual{background:#fff;border:2px solid var(--teal)}
+.dot.auto{background:#dcfce7;border:2px solid #22c55e}
+.dot.term{background:var(--teal);border-radius:50%}
+.track{display:flex;align-items:center;gap:6px;min-width:max-content}
+.node{position:relative;flex:none;min-width:120px;text-align:center;padding:16px 18px;border-radius:14px;font-weight:750;font-size:.92rem;background:#fff;border:2px solid var(--teal);color:var(--ink);box-shadow:var(--shadow-sm)}
+.node .k{display:block;font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.node.start{min-width:0;width:26px;height:26px;padding:0;border-radius:50%;background:var(--ink);border:none}
+.node.term{background:var(--grad);border:none;color:#fff}
+.node.auto{border-color:#22c55e;background:#f0fdf4}
+.node.auto .k{color:#16a34a}
+.arrow{flex:none;display:flex;flex-direction:column;align-items:center;min-width:64px;color:var(--muted)}
+.arrow .lbl{font-family:var(--mono);font-size:.68rem;color:var(--teal-deep);background:var(--soft-2);padding:1px 7px;border-radius:6px;margin-bottom:3px;white-space:nowrap}
+.arrow .line{width:100%;height:2px;background:var(--teal);position:relative}
+.arrow .line::after{content:"";position:absolute;right:-1px;top:-4px;border-left:8px solid var(--teal);border-top:5px solid transparent;border-bottom:5px solid transparent}
+.branch{display:flex;flex-direction:column;gap:14px;flex:none}
+.branch-row{display:flex;align-items:center;gap:6px}
+.arrow.up .lbl,.arrow.down .lbl{background:#fef3c7;color:#b45309}
+.arrow.up .line,.arrow.down .line{background:#f59e0b}
+.arrow.up .line::after,.arrow.down .line::after{border-left-color:#f59e0b}
+.fsm-cap{text-align:center;color:var(--muted);font-size:.85rem;margin-top:22px}
+
+/* pipeline schematic (HTML) */
+.pipe{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;justify-content:center}
+.pipe .step{flex:1 1 150px;min-width:150px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center;box-shadow:var(--shadow-sm);position:relative}
+.pipe .step .ic{font-size:1.6rem}
+.pipe .step h4{margin:8px 0 4px;font-size:1rem}
+.pipe .step p{margin:0;font-size:.82rem;color:var(--muted)}
+.pipe .conn{display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--teal);flex:0 0 40px}
+.pipe .step.out{background:var(--ink);color:#fff;border:none}
+.pipe .step.out p{color:#c7d0de}
+.pipe .step.mermaid-out{border-color:#22c55e}
+.pipe .fork{display:flex;flex-direction:column;gap:12px;flex:1 1 200px}
+@media(max-width:760px){.pipe{flex-direction:column}.pipe .conn{transform:rotate(90deg);flex-basis:30px}}
+
+/* code split */
+.codewrap{border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-md)}
+.codewrap .bar{background:var(--ink-2);color:#c7d0de;font-family:var(--mono);font-size:.78rem;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:8px}
+.codewrap .bar .dotr{width:11px;height:11px;border-radius:50%;background:#334155}
+.codewrap pre{border-radius:0}
+.mermaid-live{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;justify-content:center;box-shadow:var(--shadow-sm);min-height:120px}
+
+/* callout */
+.callout{border-radius:14px;padding:20px 24px;border:1px solid var(--line);background:var(--soft)}
+.callout.key{background:var(--soft-2);border-color:#a7f3d0}
+.callout .t{font-weight:750;margin-bottom:4px}
+.callout.amber{background:#fff7ed;border-color:#fed7aa}
+
+/* CLI */
+.cli-opts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
+.cli-opt{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:var(--shadow-sm)}
+.cli-opt code{background:var(--ink);color:#5eead4;font-size:.86rem;padding:3px 8px;border-radius:6px}
+.cli-opt p{margin:10px 0 0;font-size:.9rem;color:var(--slate)}
+
+/* two-home split */
+.homes{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.home{border-radius:18px;padding:30px;border:1px solid var(--line);background:#fff;box-shadow:var(--shadow-sm)}
+.home.grp{background:linear-gradient(180deg,#fff7ed,#fff);border-color:#fed7aa}
+.home.solo{background:linear-gradient(180deg,#e9fbf7,#fff);border-color:#a7f3d0}
+.home h3{display:flex;align-items:center;gap:10px}
+.home ul{margin:12px 0 0;padding-left:20px;color:var(--slate)}.home li{margin-bottom:7px}
+
+/* cta + footer */
+.cta-box{background:var(--grad);border-radius:26px;padding:60px 32px;color:#fff;text-align:center;box-shadow:var(--shadow-lg)}
+.cta-box h2{color:#fff}.cta-box p{color:rgba(255,255,255,.92);max-width:52ch;margin:10px auto 24px;font-size:1.12rem}
+.footer{background:var(--ink);color:#8a94a6;padding:50px 0 30px}
+.footer a{color:#c7d0de}
+.footer-grid{display:flex;justify-content:space-between;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.footer .brand{margin-bottom:8px}
+.footer-links{display:flex;gap:40px;flex-wrap:wrap}
+.footer-links h4{color:#fff;font-size:.9rem;margin:0 0 12px}
+.footer-links ul{list-style:none;margin:0;padding:0}.footer-links li{margin-bottom:8px;font-size:.92rem}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.1);margin-top:36px;padding-top:20px;font-size:.85rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+@media(max-width:860px){.grid-3,.grid-2,.homes,.cli-opts{grid-template-columns:1fr}section{padding:60px 0}}
+</style>
+</head>
+<body>
+
+<!-- svg logo mark definition (inline, reused) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="fg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#0d9488"/></linearGradient>
+</defs></svg>
+
+<nav class="nav"><div class="wrap nav-inner">
+  <a class="brand" href="#top">
+    <svg class="logo-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="9" cy="20" r="6" fill="url(#fg)"/>
+      <circle cx="31" cy="9" r="5.5" fill="none" stroke="#2dd4bf" stroke-width="2.5"/>
+      <circle cx="31" cy="31" r="5.5" fill="#f89038"/>
+      <path d="M14.5 18 L26 11" stroke="#2dd4bf" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M14.5 22 L26 29" stroke="#5eead4" stroke-width="2.2" stroke-linecap="round"/>
+    </svg>
+    Finito <span class="grp">Chenile</span>
+  </a>
+  <div class="nav-links">
+    <a href="#what">Concepts</a>
+    <a href="#dsl">DSL</a>
+    <a href="#diagrams">Diagrams</a>
+    <a href="#blueprint">Blueprint</a>
+    <a href="#cli">CLI</a>
+    <a class="nav-cta" href="https://github.com/rajakolluru">GitHub ↗</a>
+  </div>
+</div></nav>
+
+<!-- HERO -->
+<header class="hero" id="top"><div class="hero-inner wrap">
+  <span class="eyebrow">Finite state machines for Java</span>
+  <h1>State machines that <span class="g">explain themselves</span>.</h1>
+  <p class="lead">Finito is a lightweight, XML-driven state machine engine. Describe your workflow declaratively — states, events, transitions — and Finito runs it, generates a whole service from it, and draws the diagram for you in Mermaid and PlantUML.</p>
+  <div class="badges">
+    <span class="badge amber">Part of the <b>Chenile</b> group</span>
+    <span class="badge"><b>Runs standalone</b> — plain Java, no framework required</span>
+    <span class="badge"><b>org.chenile.stm</b></span>
+  </div>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="#quickstart">Quickstart →</a>
+    <a class="btn btn-light" href="#diagrams">See auto-diagrams</a>
+    <a class="btn btn-light" href="https://github.com/rajakolluru">View source</a>
+  </div>
+  <div class="hero-note">define in XML · drive with STM.proceed(entity, event) · generate api + service + diagrams</div>
+</div></header>
+
+<!-- WHAT IS FINITO -->
+<section id="what"><div class="wrap">
+  <div class="section-head">
+    <span class="eyebrow">The idea</span>
+    <h2>A workflow is a set of states and the events that move between them</h2>
+    <p class="lead">Finito models that directly. You define a <b>flow</b> of <b>states</b>; <b>events</b> trigger <b>transitions</b>, optionally running an action. Your entity carries its own state, and one call advances it.</p>
+  </div>
+  <div class="grid-3">
+    <div class="card"><div class="ic">🟢</div><h3>States</h3><p><b>Manual states</b> wait for an event (a user or system action). <b>Auto states</b> decide their own next move by evaluating a condition on the data.</p></div>
+    <div class="card"><div class="ic">⚡</div><h3>Events &amp; transitions</h3><p>An <code>&lt;on&gt;</code> maps an <code>eventId</code> to a <code>newStateId</code> and an optional action component. That's the whole grammar of movement.</p></div>
+    <div class="card"><div class="ic">📦</div><h3>State entities</h3><p>Your domain object extends <code>StateEntity</code> and carries its current state. <code>STM.proceed(entity, event, payload)</code> runs the transition — actions, guards and all.</p></div>
+  </div>
+  <div class="callout key" style="margin-top:30px">
+    <div class="t">One tiny interface at the core</div>
+    <code>STM.proceed(entity, event, payload)</code> is the engine's whole runtime surface. Everything else — actions, entry/exit hooks, security, enablement, diagrams — hangs off the declarative flow definition.
+  </div>
+</div></section>
+
+<!-- HTML STATE-DIAGRAM SCHEMATIC -->
+<section class="bg-soft" id="schematic"><div class="wrap">
+  <div class="section-head">
+    <span class="eyebrow">A flow, at a glance</span>
+    <h2>A product-returns workflow</h2>
+    <p class="lead">Here is the same state machine three ways — as a diagram, as the XML you write, and as the Mermaid &amp; PlantUML Finito generates from it. First, the diagram (rendered here in plain HTML).</p>
+  </div>
+
+  <div class="fsm">
+    <div class="fsm-legend">
+      <span><i class="dot start"></i> start</span>
+      <span><i class="dot manual"></i> manual state</span>
+      <span><i class="dot auto"></i> auto state (decides itself)</span>
+      <span><i class="dot term"></i> terminal state</span>
+    </div>
+    <div class="track">
+      <div class="node start" title="start"></div>
+      <div class="arrow"><span class="line"></span></div>
+      <div class="node"><span class="k">manual · initial</span>REQUESTED</div>
+      <div class="arrow"><span class="lbl">approve</span><span class="line"></span></div>
+      <div class="node"><span class="k">manual</span>APPROVED</div>
+      <div class="arrow"><span class="lbl">ship</span><span class="line"></span></div>
+      <div class="node"><span class="k">manual</span>LABEL_SENT</div>
+      <div class="arrow"><span class="lbl">receive</span><span class="line"></span></div>
+      <div class="node auto"><span class="k">auto · inspect</span>INSPECTION</div>
+      <div class="branch">
+        <div class="branch-row">
+          <div class="arrow up"><span class="lbl">ok</span><span class="line"></span></div>
+          <div class="node term"><span class="k">terminal</span>REFUNDED</div>
+        </div>
+        <div class="branch-row">
+          <div class="arrow down"><span class="lbl">damaged</span><span class="line"></span></div>
+          <div class="node term"><span class="k">terminal</span>REJECTED</div>
+        </div>
+      </div>
+    </div>
+    <p class="fsm-cap">REQUESTED also transitions to REJECTED on <code>reject</code>. The <b>auto state</b> INSPECTION evaluates the item's condition and routes itself — no event needed from the caller.</p>
+  </div>
+</div></section>
+
+<!-- DSL -->
+<section id="dsl"><div class="wrap">
+  <div class="section-head">
+    <span class="eyebrow">The DSL</span>
+    <h2>You write the XML. That's the source of truth.</h2>
+    <p class="lead">Declarative, reviewable, versionable. The same file drives the engine, the generated service, and every diagram.</p>
+  </div>
+  <div class="codewrap">
+    <div class="bar"><i class="dotr"></i> returns-states.xml</div>
+<pre><code><span class="tok-tag">&lt;states&gt;</span>
+  <span class="tok-tag">&lt;flow</span> <span class="tok-attr">id</span>=<span class="tok-str">'returns-flow'</span> <span class="tok-attr">default</span>=<span class="tok-str">'true'</span><span class="tok-tag">&gt;</span>
+    <span class="tok-tag">&lt;entry-action</span> <span class="tok-attr">componentName</span>=<span class="tok-str">"returnsEntryAction"</span><span class="tok-tag">/&gt;</span>
+
+    <span class="tok-cm">&lt;!-- manual state: waits for an event --&gt;</span>
+    <span class="tok-tag">&lt;manual-state</span> <span class="tok-attr">id</span>=<span class="tok-str">'REQUESTED'</span> <span class="tok-attr">initialState</span>=<span class="tok-str">'true'</span> <span class="tok-attr">meta-mainPath</span>=<span class="tok-str">"true"</span><span class="tok-tag">&gt;</span>
+      <span class="tok-tag">&lt;on</span> <span class="tok-attr">eventId</span>=<span class="tok-str">'approve'</span> <span class="tok-attr">newStateId</span>=<span class="tok-str">'APPROVED'</span> <span class="tok-attr">componentName</span>=<span class="tok-str">'ApproveReturn'</span><span class="tok-tag">/&gt;</span>
+      <span class="tok-tag">&lt;on</span> <span class="tok-attr">eventId</span>=<span class="tok-str">'reject'</span>  <span class="tok-attr">newStateId</span>=<span class="tok-str">'REJECTED'</span><span class="tok-tag">/&gt;</span>
+    <span class="tok-tag">&lt;/manual-state&gt;</span>
+
+    <span class="tok-tag">&lt;manual-state</span> <span class="tok-attr">id</span>=<span class="tok-str">'APPROVED'</span> <span class="tok-attr">meta-mainPath</span>=<span class="tok-str">"true"</span><span class="tok-tag">&gt;</span>
+      <span class="tok-tag">&lt;on</span> <span class="tok-attr">eventId</span>=<span class="tok-str">'ship'</span> <span class="tok-attr">newStateId</span>=<span class="tok-str">'LABEL_SENT'</span><span class="tok-tag">/&gt;</span>
+    <span class="tok-tag">&lt;/manual-state&gt;</span>
+
+    <span class="tok-tag">&lt;manual-state</span> <span class="tok-attr">id</span>=<span class="tok-str">'LABEL_SENT'</span> <span class="tok-attr">meta-mainPath</span>=<span class="tok-str">"true"</span><span class="tok-tag">&gt;</span>
+      <span class="tok-tag">&lt;on</span> <span class="tok-attr">eventId</span>=<span class="tok-str">'receive'</span> <span class="tok-attr">newStateId</span>=<span class="tok-str">'INSPECTION'</span><span class="tok-tag">/&gt;</span>
+    <span class="tok-tag">&lt;/manual-state&gt;</span>
+
+    <span class="tok-cm">&lt;!-- auto state: decides its own next state from the data --&gt;</span>
+    <span class="tok-tag">&lt;auto-state</span> <span class="tok-attr">id</span>=<span class="tok-str">'INSPECTION'</span> <span class="tok-attr">code</span>=<span class="tok-str">'payload.condition'</span><span class="tok-tag">&gt;</span>
+      <span class="tok-tag">&lt;on</span> <span class="tok-attr">eventId</span>=<span class="tok-str">'ok'</span>      <span class="tok-attr">newStateId</span>=<span class="tok-str">'REFUNDED'</span> <span class="tok-attr">componentName</span>=<span class="tok-str">'IssueRefund'</span><span class="tok-tag">/&gt;</span>
+      <span class="tok-tag">&lt;on</span> <span class="tok-attr">eventId</span>=<span class="tok-str">'damaged'</span> <span class="tok-attr">newStateId</span>=<span class="tok-str">'REJECTED'</span><span class="tok-tag">/&gt;</span>
+    <span class="tok-tag">&lt;/auto-state&gt;</span>
+
+    <span class="tok-tag">&lt;manual-state</span> <span class="tok-attr">id</span>=<span class="tok-str">'REFUNDED'</span><span class="tok-tag">/&gt;</span>
+    <span class="tok-tag">&lt;manual-state</span> <span class="tok-attr">id</span>=<span class="tok-str">'REJECTED'</span><span class="tok-tag">/&gt;</span>
+  <span class="tok-tag">&lt;/flow&gt;</span>
+<span class="tok-tag">&lt;/states&gt;</span></code></pre>
+  </div>
+  <div class="grid-3" style="margin-top:26px">
+    <div class="card"><div class="ic">🧩</div><h3>Actions on transitions</h3><p><code>componentName</code> runs code when an event fires. Add <code>entry-action</code> / <code>exit-action</code> per state, and a <code>default-transition-action</code> for the flow.</p></div>
+    <div class="card"><div class="ic">🔀</div><h3>Auto states &amp; guards</h3><p><code>&lt;auto-state code="…"&gt;</code> (and <code>&lt;if&gt;</code>) evaluate an OGNL expression on the entity to branch automatically — decisions live in the flow, not scattered in code.</p></div>
+    <div class="card"><div class="ic">🔐</div><h3>Policies in the flow</h3><p>Attach a <code>security-strategy</code> and <code>meta-acls</code> permissions to events, or an <code>enablement-strategy</code> to switch transitions on and off by configuration.</p></div>
+  </div>
+</div></section>
+
+<!-- DIAGRAMS -->
+<section class="bg-ink" id="diagrams"><div class="wrap">
+  <div class="section-head">
+    <span class="eyebrow">Automatic diagrams</span>
+    <h2>Your diagram is generated — never hand-drawn, never stale</h2>
+    <p class="lead">Finito reads the XML and emits state diagrams in both <b>Mermaid</b> and <b>PlantUML</b>. Main-path, auto and orphaned states are colour-coded automatically, so the picture always matches the running machine.</p>
+  </div>
+
+  <!-- HTML pipeline schematic -->
+  <div class="pipe" style="margin-bottom:40px">
+    <div class="step"><div class="ic">📄</div><h4>returns-states.xml</h4><p>your single source of truth</p></div>
+    <div class="conn">→</div>
+    <div class="step out"><div class="ic">⚙️</div><h4>Finito generators</h4><p>StmPumlGenerator · STMMermaidGenerator</p></div>
+    <div class="conn">→</div>
+    <div class="fork">
+      <div class="step mermaid-out"><div class="ic">🌊</div><h4>Mermaid</h4><p>stateDiagram-v2 · renders on the web</p></div>
+      <div class="step"><div class="ic">🌱</div><h4>PlantUML</h4><p>.puml · for docs &amp; CI</p></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="codewrap">
+      <div class="bar"><i class="dotr"></i> returns-states.mmd &nbsp;·&nbsp; generated Mermaid</div>
+<pre><code>stateDiagram-v2
+  classDef mainPath fill:Bisque,stroke:Peru,stroke-width:4px;
+  classDef autoState fill:PaleGreen,stroke:green,stroke-width:2.5px;
+  [*] --> REQUESTED
+  REQUESTED --> APPROVED : approve
+  REQUESTED --> REJECTED : reject
+  APPROVED --> LABEL_SENT : ship
+  LABEL_SENT --> RECEIVED : receive
+  state INSPECTION &lt;&lt;choice&gt;&gt;
+  RECEIVED --> INSPECTION : inspect
+  INSPECTION --> REFUNDED : ok
+  INSPECTION --> REJECTED : damaged
+  class REQUESTED mainPath
+  class INSPECTION autoState</code></pre>
+    </div>
+    <div class="codewrap">
+      <div class="bar"><i class="dotr"></i> returns-states.puml &nbsp;·&nbsp; generated PlantUML</div>
+<pre><code>@startuml
+[*] --> REQUESTED
+REQUESTED --> APPROVED : approve
+REQUESTED --> REJECTED : reject
+APPROVED --> LABEL_SENT : ship
+LABEL_SENT --> RECEIVED : receive
+state INSPECTION &lt;&lt;choice&gt;&gt;
+RECEIVED --> INSPECTION : inspect
+INSPECTION --> REFUNDED : ok
+INSPECTION --> REJECTED : damaged
+@enduml</code></pre>
+    </div>
+  </div>
+
+  <p style="text-align:center;margin-top:30px">
+    <span class="badge">Live Mermaid render from the code above ↓</span>
+  </p>
+  <div class="mermaid-live" style="margin-top:14px">
+    <pre class="mermaid">
+stateDiagram-v2
+  [*] --> REQUESTED
+  REQUESTED --> APPROVED : approve
+  REQUESTED --> REJECTED : reject
+  APPROVED --> LABEL_SENT : ship
+  LABEL_SENT --> RECEIVED : receive
+  state INSPECTION &lt;&lt;choice&gt;&gt;
+  RECEIVED --> INSPECTION : inspect
+  INSPECTION --> REFUNDED : ok
+  INSPECTION --> REJECTED : damaged
+    </pre>
+  </div>
+</div></section>
+
+<!-- BLUEPRINT -->
+<section id="blueprint"><div class="wrap">
+  <div class="section-head">
+    <span class="eyebrow">The blueprint · jgen</span>
+    <h2>From one XML file to a running workflow service</h2>
+    <p class="lead">Finito ships an inbuilt blueprint — <code>bp-wfcustom</code> — that <b>jgen</b> expands into a complete Chenile service: an <code>-api</code> module and a <code>-service</code> module, wired to your state machine.</p>
+  </div>
+
+  <div class="pipe" style="margin-bottom:36px">
+    <div class="step"><div class="ic">📄</div><h4>your states.xml</h4><p>+ a few answers</p></div>
+    <div class="conn">→</div>
+    <div class="step out"><div class="ic">🧬</div><h4>jgen · bp-wfcustom</h4><p>the inbuilt blueprint</p></div>
+    <div class="conn">→</div>
+    <div class="fork">
+      <div class="step"><div class="ic">📘</div><h4>returns-api</h4><p>StateEntity + service contract</p></div>
+      <div class="step"><div class="ic">⚙️</div><h4>returns-service</h4><p>actions, config, tests</p></div>
+      <div class="step mermaid-out"><div class="ic">🖼️</div><h4>diagrams</h4><p>Mermaid + PlantUML</p></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <h3 style="margin-bottom:12px">The contract is standardized</h3>
+      <p style="color:var(--slate)">Your entity extends <code>AbstractStateEntity</code>; the generated API uses the shared <code>StateEntityService&lt;T&gt;</code> — so every workflow service exposes the same verbs:</p>
+      <div class="codewrap">
+        <div class="bar"><i class="dotr"></i> StateEntityService&lt;Returns&gt;</div>
+<pre><code><span class="tok-kw">process</span>(entity, event, payload)
+<span class="tok-kw">processById</span>(id, event, payload)
+<span class="tok-kw">create</span>(entity)
+<span class="tok-kw">retrieve</span>(id)
+<span class="tok-kw">getAllowedActionsAndMetadata</span>(id)</code></pre>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Toggle features at generation time</h3>
+      <p style="color:var(--slate)">The blueprint asks what you need and wires it in — no boilerplate to hand-write:</p>
+      <div class="grid-2" style="gap:12px">
+        <div class="card" style="padding:16px"><b>JPA</b><p style="margin:4px 0 0;font-size:.86rem;color:var(--muted)">persistence for your entity</p></div>
+        <div class="card" style="padding:16px"><b>Security</b><p style="margin:4px 0 0;font-size:.86rem;color:var(--muted)">ACL perms on events</p></div>
+        <div class="card" style="padding:16px"><b>Activities</b><p style="margin:4px 0 0;font-size:.86rem;color:var(--muted)">mandatory/optional checklists</p></div>
+        <div class="card" style="padding:16px"><b>Enablement</b><p style="margin:4px 0 0;font-size:.86rem;color:var(--muted)">toggle transitions by config</p></div>
+        <div class="card" style="padding:16px"><b>Cloud switch</b><p style="margin:4px 0 0;font-size:.86rem;color:var(--muted)">edge ↔ cloud routing</p></div>
+        <div class="card" style="padding:16px"><b>BDD tests</b><p style="margin:4px 0 0;font-size:.86rem;color:var(--muted)">generated Cucumber specs</p></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- CLI -->
+<section class="bg-soft" id="cli"><div class="wrap">
+  <div class="section-head">
+    <span class="eyebrow">stm-cli</span>
+    <h2>A command line for your state machines</h2>
+    <p class="lead"><code>stm-cli</code> works straight off your XML — validate a flow, generate its diagram, and even scaffold test cases from the transitions.</p>
+  </div>
+  <div class="codewrap" style="max-width:720px;margin:0 auto 26px">
+    <div class="bar"><i class="dotr"></i> terminal</div>
+<pre><code><span class="tok-cm"># render a Mermaid state diagram from a flow</span>
+stm-cli --mermaid returns-states.xml
+
+<span class="tok-cm"># generate test cases that walk every transition</span>
+stm-cli --generate-test-cases returns-states.xml
+
+<span class="tok-cm"># render a state diagram for each generated test path</span>
+stm-cli --render-tests-as-state returns-states.xml</code></pre>
+  </div>
+  <div class="cli-opts">
+    <div class="cli-opt"><code>-m, --mermaid</code><p>Emit a Mermaid-compatible state diagram for the flow.</p></div>
+    <div class="cli-opt"><code>-t, --generate-test-cases</code><p>Generate test cases that exercise the machine's transitions.</p></div>
+    <div class="cli-opt"><code>-r, --render-tests-as-state</code><p>Draw a state diagram for every generated test case path.</p></div>
+  </div>
+</div></section>
+
+<!-- CHENILE GROUP OR STANDALONE -->
+<section id="standalone"><div class="wrap">
+  <div class="section-head">
+    <span class="eyebrow">Where it fits</span>
+    <h2>Part of Chenile — happy on its own</h2>
+    <p class="lead">Finito is the state-machine core of the Chenile framework, but the engine has no framework strings attached. Use whichever door suits you.</p>
+  </div>
+  <div class="homes">
+    <div class="home solo">
+      <h3>🧩 Standalone engine</h3>
+      <p style="color:var(--slate)">Drop <code>org.chenile.stm</code> into any Java app. Read a flow with <code>XmlFlowReader</code> (or the <code>FluentFlowReader</code> API), then drive entities with <code>STM.proceed(...)</code>.</p>
+      <ul>
+        <li>Plain Java — no Spring, no container required</li>
+        <li>Pluggable strategies (scripting, security, store) with sensible no-op defaults</li>
+        <li>Generate Mermaid / PlantUML from your XML with the CLI</li>
+        <li>Perfect for embedding a workflow inside an existing service</li>
+      </ul>
+    </div>
+    <div class="home grp">
+      <h3>🟠 Within the Chenile group</h3>
+      <p style="color:var(--slate)">Use the full <b>workflow blueprint</b> and get a first-class Chenile service: persistence, security, activities, BDD tests and REST endpoints around your machine.</p>
+      <ul>
+        <li>Generated <code>-api</code> + <code>-service</code> via <code>jgen bp-wfcustom</code></li>
+        <li>Shares Chenile's interceptors, registry and messaging</li>
+        <li>The same state machine, now a deployable microservice</li>
+        <li>Versioned with the Chenile release train</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout amber" style="margin-top:26px">
+    <div class="t">In one line</div>
+    Finito belongs to the Chenile group and benefits from all of it — but the state machine at its heart is a small, dependency-light Java library you can use entirely on its own.
+  </div>
+</div></section>
+
+<!-- QUICKSTART / CTA -->
+<section id="quickstart"><div class="wrap">
+  <div class="cta-box">
+    <h2>Model your first state machine</h2>
+    <p>Write a flow in XML, drive it with one call, and let Finito draw the diagram. Then let jgen turn it into a service when you're ready.</p>
+    <div class="hero-actions" style="justify-content:center">
+      <a class="btn btn-ghost" href="https://github.com/rajakolluru">Get the code</a>
+      <a class="btn btn-light" href="#dsl">Read the DSL</a>
+    </div>
+  </div>
+</div></section>
+
+<footer class="footer"><div class="wrap">
+  <div class="footer-grid">
+    <div style="max-width:34ch">
+      <a class="brand" href="#top">
+        <svg class="logo-mark" viewBox="0 0 40 40" fill="none"><circle cx="9" cy="20" r="6" fill="url(#fg)"/><circle cx="31" cy="9" r="5.5" fill="none" stroke="#2dd4bf" stroke-width="2.5"/><circle cx="31" cy="31" r="5.5" fill="#f89038"/><path d="M14.5 18 L26 11" stroke="#2dd4bf" stroke-width="2.2" stroke-linecap="round"/><path d="M14.5 22 L26 29" stroke="#5eead4" stroke-width="2.2" stroke-linecap="round"/></svg>
+        Finito <span class="grp">Chenile</span>
+      </a>
+      <p style="margin-top:12px">The XML-driven finite state machine at the heart of Chenile. Declarative flows, automatic diagrams, and a generator that turns a state machine into a service.</p>
+    </div>
+    <div class="footer-links">
+      <div><h4>Learn</h4><ul>
+        <li><a href="#what">Concepts</a></li>
+        <li><a href="#dsl">The DSL</a></li>
+        <li><a href="#diagrams">Auto diagrams</a></li>
+        <li><a href="#blueprint">The blueprint</a></li>
+        <li><a href="#cli">stm-cli</a></li>
+      </ul></div>
+      <div><h4>Ecosystem</h4><ul>
+        <li><a href="https://chenile.org">Chenile framework ↗</a></li>
+        <li><a href="https://github.com/rajakolluru">GitHub ↗</a></li>
+      </ul></div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span id="yr"></span> Finito · part of the Chenile group.</span>
+    <span style="font-family:var(--mono)">thefinito.org</span>
+  </div>
+</div></footer>
+
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<script type="module">
+  try{
+    const {default:mermaid}=await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
+    mermaid.initialize({startOnLoad:true,theme:'base',themeVariables:{
+      primaryColor:'#e9fbf7',primaryBorderColor:'#14b8a6',primaryTextColor:'#0b1120',
+      lineColor:'#0d9488',fontFamily:'Inter, sans-serif'}});
+  }catch(e){/* offline: the generated Mermaid source above is still shown */}
+</script>
+</body>
+</html>
