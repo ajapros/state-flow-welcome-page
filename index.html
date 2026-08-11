@@ -189,6 +189,39 @@ section{padding:80px 0}
 .footer-links ul{list-style:none;margin:0;padding:0}.footer-links li{margin-bottom:8px;font-size:.92rem}
 .footer-bottom{border-top:1px solid rgba(255,255,255,.1);margin-top:34px;padding-top:20px;font-size:.85rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 
+/* animated state machine */
+.anim{background:#fff;border:1px solid var(--line);border-radius:20px;padding:30px 24px;box-shadow:var(--shadow-md)}
+.anim-scroll{overflow-x:auto}
+.anim-track{position:relative;display:flex;align-items:center;min-width:max-content;padding:16px 6px 8px}
+.anim-state{position:relative;flex:none;min-width:116px;text-align:center;padding:14px 16px;border-radius:14px;font-weight:750;font-size:.9rem;background:#fff;border:2px solid var(--line);color:var(--muted);box-shadow:var(--shadow-sm);transition:all .45s ease}
+.anim-state .k{display:block;font-size:.62rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.anim-state.active{border-color:transparent;background:var(--grad);color:#fff;transform:translateY(-4px) scale(1.06);box-shadow:var(--shadow-lg)}
+.anim-state.active .k{color:rgba(255,255,255,.85)}
+.anim-state.auto{border-style:dashed;border-color:var(--green)}
+.anim-state.auto.active{background:linear-gradient(135deg,#16a34a,#22c55e);border-style:solid}
+.anim-state.visited{border-color:var(--accent);color:var(--ink)}
+.anim-conn{flex:none;width:76px;height:3px;background:var(--line);position:relative;align-self:center;margin-top:6px;border-radius:2px;transition:background .3s}
+.anim-conn .elbl{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:.66rem;color:var(--muted);white-space:nowrap;background:var(--soft);padding:0 5px;border-radius:5px;transition:all .3s}
+.anim-conn.lit{background:var(--accent)}
+.anim-conn.lit .elbl{color:#fff;background:var(--accent-deep)}
+.anim-conn .spark{position:absolute;top:50%;left:0;width:12px;height:12px;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%) scale(0);box-shadow:0 0 12px 3px rgba(251,146,16,.5)}
+.anim-conn.lit .spark{animation:spark .55s ease forwards}
+@keyframes spark{0%{left:0;transform:translate(-50%,-50%) scale(1)}100%{left:100%;transform:translate(-50%,-50%) scale(1)}}
+.anim-cap{margin-top:16px;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px 16px;font-size:.95rem;color:var(--slate);min-height:1.5em;text-align:center}
+.anim-cap b{color:var(--ink)}.anim-cap .ev{font-family:var(--mono);color:var(--accent-deep);font-weight:700}
+.anim-bar{margin-top:14px;display:flex;gap:10px;justify-content:center}
+.abtn{appearance:none;border:0;background:var(--grad);color:#fff;font-weight:650;font-family:var(--font);font-size:.92rem;padding:10px 18px;border-radius:999px;cursor:pointer}
+.abtn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.traj-hdr{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px 15px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.traj-hdr .tg{font-size:.66rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--ink);padding:4px 9px;border-radius:999px}
+.traj{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.traj-card{background:#fff;border:2px solid var(--line);border-radius:14px;padding:18px;transition:all .4s}
+.traj-card.hot{border-color:var(--accent);box-shadow:0 0 0 3px rgba(251,146,16,.12)}
+.traj-card.changed{animation:trajp .6s ease}
+@keyframes trajp{0%{transform:scale(1)}45%{transform:scale(1.04)}100%{transform:scale(1)}}
+.traj-card h5{margin:0 0 8px;font-size:.92rem}.traj-card p{margin:8px 0 0;font-size:.82rem;color:var(--muted)}
+@media(max-width:680px){.traj{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.anim-conn.lit .spark{animation:none}.anim-state{transition:none}.traj-card.changed{animation:none}}
 @media(max-width:860px){.grid-3,.grid-2,.homes,.cli-opts,.ways{grid-template-columns:1fr}section{padding:58px 0}.ways{max-width:100%}}
 </style>
 </head>
@@ -201,6 +234,7 @@ section{padding:80px 0}
     <a href="#build">Build a flow</a>
     <a href="#features">Features</a>
     <a href="#conventions">Conventions</a>
+    <a href="#trajectories">Trajectories</a>
     <a href="#diagrams">Diagrams</a>
     <a href="#cli">CLI</a>
     <a class="nav-cta" href="https://github.com/rajakolluru">GitHub ↗</a>
@@ -321,9 +355,20 @@ section{padding:80px 0}
 <section id="schematic"><div class="wrap">
   <div class="section-head">
     <span class="eyebrow">A flow, at a glance</span>
-    <h2>The returns workflow, drawn in plain HTML</h2>
-    <p class="lead">However you defined it, this is the machine — and further down, Finito draws exactly this for you in Mermaid and PlantUML.</p>
+    <h2>The returns workflow — watch it run</h2>
+    <p class="lead">However you defined it, this is the machine. Below it animates: an entity walks its states as events fire; the auto state routes itself. Under that, the same flow as a static reference.</p>
   </div>
+
+  <div class="anim" id="finito-anim" style="margin-bottom:26px">
+    <div class="anim-scroll"><div class="anim-track"></div></div>
+    <div class="anim-cap">An entity walks its states as events fire. Press <b>Play</b>.</div>
+    <div class="anim-bar">
+      <button class="abtn" data-a="play">▶ Play</button>
+      <button class="abtn ghost" data-a="step">Step</button>
+      <button class="abtn ghost" data-a="reset">Reset</button>
+    </div>
+  </div>
+
   <div class="fsm">
     <div class="fsm-legend">
       <span><i class="dot start"></i> start</span>
@@ -480,6 +525,29 @@ stateDiagram-v2
 </div></section>
 
 <!-- BLUEPRINT -->
+<section id="trajectories" class="bg-soft"><div class="wrap">
+  <div class="section-head">
+    <span class="eyebrow">Trajectories</span>
+    <h2>Run a different flow behaviour — without branching</h2>
+    <p class="lead">A <b>trajectory</b> is an ephemeral, per-request variant selected by the header <code>x-chenile-trajectory-id</code>. Because Finito resolves its transition actions and auto-states <a href="#conventions">by convention</a>, a trajectory can point an event at a <em>different</em> action or auto-state computation — no <code>if</code> statements, nothing to untangle later.</p>
+  </div>
+  <div class="anim" id="finito-traj">
+    <div class="traj-hdr"><span class="tg">request</span><code id="traj-h">— no trajectory header —</code></div>
+    <div class="traj">
+      <div class="traj-card" id="traj-act"></div>
+      <div class="traj-card" id="traj-auto"></div>
+    </div>
+    <div class="anim-cap" id="traj-note">Pick a trajectory — or press Play — to see the resolver pick a different bean.</div>
+    <div class="anim-bar">
+      <button class="abtn ghost" data-t="(default)">(default)</button>
+      <button class="abtn ghost" data-t="t1">t1</button>
+      <button class="abtn" data-t="play">▶ Play</button>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:22px"><div class="t">Same idea, framework-wide</div>
+  In the full Chenile framework a trajectory also swaps the <b>service implementation</b> (<code>@ConditionalOnTrajectory</code>) and returns different <b>configuration</b> values — read the <a href="https://chenile.org/concepts/14-trajectories/">Trajectories chapter on chenile.org</a>.</div>
+</div></section>
+
 <section id="blueprint"><div class="wrap">
   <div class="section-head">
     <span class="eyebrow">The blueprint · jgen</span>
@@ -580,6 +648,7 @@ stm-cli --render-tests-as-state returns-states.xml</code></pre>
         <li><a href="#build">Build a flow</a></li>
         <li><a href="#features">Features</a></li>
         <li><a href="#conventions">Conventions</a></li>
+        <li><a href="#trajectories">Trajectories</a></li>
         <li><a href="#diagrams">Auto diagrams</a></li>
         <li><a href="#cli">stm-cli</a></li>
       </ul></div>
@@ -605,6 +674,73 @@ stm-cli --render-tests-as-state returns-states.xml</code></pre>
       document.querySelectorAll('.way-panel').forEach(function(p){p.classList.toggle('active',p.getAttribute('data-way')===w)});
     });
   });
+</script>
+<script>
+// Animated state machine (self-contained)
+(function(){
+  var root=document.getElementById('finito-anim'); if(!root) return;
+  var track=root.querySelector('.anim-track'), cap=root.querySelector('.anim-cap');
+  var reduced=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var mainPath=[{id:'REQUESTED',kind:'initial'},{id:'APPROVED',ev:'approve'},{id:'LABEL_SENT',ev:'ship'},{id:'INSPECTION',ev:'receive',kind:'auto'}];
+  var nodes=[],conns=[],seq=[],i=-1,timer=null,damaged=false;
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function build(){
+    track.innerHTML='';nodes=[];conns=[];
+    var term=damaged?{id:'REJECTED',ev:'damaged',kind:'terminal'}:{id:'REFUNDED',ev:'ok',kind:'terminal'};
+    seq=mainPath.concat([term]);
+    seq.forEach(function(s,k){
+      if(k>0){var cn=document.createElement('div');cn.className='anim-conn';cn.innerHTML='<span class="elbl">'+esc(s.ev)+'</span><span class="spark"></span>';track.appendChild(cn);conns.push(cn);}
+      var kl=s.kind==='initial'?'manual · initial':s.kind==='auto'?'auto':s.kind==='terminal'?'terminal':'manual';
+      var n=document.createElement('div');n.className='anim-state'+(s.kind==='auto'?' auto':'');n.innerHTML='<span class="k">'+kl+'</span>'+esc(s.id);track.appendChild(n);nodes.push(n);
+    });
+  }
+  function clearHi(){nodes.forEach(function(n){n.classList.remove('active','visited');});conns.forEach(function(c){c.classList.remove('lit');});}
+  function show(k){
+    nodes.forEach(function(n,x){n.classList.toggle('active',x===k);n.classList.toggle('visited',x<k);});
+    if(k>0)conns[k-1].classList.add('lit');
+    var s=seq[k];
+    cap.innerHTML=k===0?'Created in <b>'+esc(s.id)+'</b> (initial state).':
+      (s.id==='REFUNDED'?'Auto state inspected the item → <span class="ev">ok</span> → <b>REFUNDED</b>.':
+       s.id==='REJECTED'?'Auto state inspected the item → <span class="ev">damaged</span> → <b>REJECTED</b>.':
+       'Event <span class="ev">'+esc(s.ev)+'</span> → entered <b>'+esc(s.id)+'</b>.');
+  }
+  function advance(){i++;if(i>=seq.length){i=-1;damaged=!damaged;build();clearHi();cap.innerHTML='Restarting — this run takes the <b>'+(damaged?'damaged':'ok')+'</b> branch at inspection.';return;}show(i);}
+  function stop(){if(timer){clearInterval(timer);timer=null;}root.querySelector('[data-a=play]').innerHTML='▶ Play';}
+  function start(){root.querySelector('[data-a=play]').innerHTML='❚❚ Pause';if(i<0){i=0;show(0);}timer=setInterval(advance,reduced?1500:1150);}
+  root.querySelector('[data-a=play]').onclick=function(){timer?stop():start();};
+  root.querySelector('[data-a=step]').onclick=function(){stop();advance();};
+  root.querySelector('[data-a=reset]').onclick=function(){stop();i=-1;damaged=false;build();clearHi();cap.innerHTML='Reset. Press <b>Play</b> or <b>Step</b>.';};
+  build();
+  if('IntersectionObserver' in window){var seen=false;new IntersectionObserver(function(es,ob){es.forEach(function(e){if(e.isIntersecting&&!seen){seen=true;setTimeout(start,400);ob.disconnect();}});},{threshold:0.4}).observe(root);}
+})();
+
+// Trajectory switch (self-contained)
+(function(){
+  var root=document.getElementById('finito-traj'); if(!root) return;
+  var reduced=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var h=document.getElementById('traj-h'),act=document.getElementById('traj-act'),auto=document.getElementById('traj-auto'),note=document.getElementById('traj-note');
+  var T={
+    '(default)':{hdr:'— no trajectory header —',act:'returnsApproveAction',actp:'the default transition action for <code>approve</code>',auto:'inspectionAutoState',autop:'the default auto-state computation',hot:false,note:'Default wiring — the resolver finds the standard beans.'},
+    't1':{hdr:'x-chenile-trajectory-id: t1',act:'returnsApprove<b>T1</b>Action',actp:'a t1-only action — e.g. an extra approval step',auto:'inspection<b>T1</b>AutoState',autop:'a t1-only inspection rule',hot:true,note:'For t1, the resolver picks the trajectory-specific action &amp; auto-state — the STM XML is unchanged.'}
+  };
+  function pulse(e){e.classList.remove('changed');void e.offsetWidth;e.classList.add('changed');}
+  function show(k){
+    Array.prototype.forEach.call(root.querySelectorAll('[data-t]'),function(b){if(b.dataset.t!=='play')b.classList.toggle('abtn',true);});
+    var d=T[k];h.innerHTML=d.hdr;
+    act.innerHTML='<h5>🧩 Transition action · <code>approve</code></h5><code>'+d.act+'</code><p>'+d.actp+'</p>';
+    auto.innerHTML='<h5>🔀 Auto-state · <code>INSPECTION</code></h5><code>'+d.auto+'</code><p>'+d.autop+'</p>';
+    act.classList.toggle('hot',d.hot);auto.classList.toggle('hot',d.hot);
+    if(d.hot){pulse(act);pulse(auto);}
+    note.innerHTML=d.note;
+  }
+  var keys=Object.keys(T),i=0,timer=null,playBtn=root.querySelector('[data-t=play]');
+  function stop(){if(timer){clearInterval(timer);timer=null;playBtn.innerHTML='▶ Play';}}
+  function start(){playBtn.innerHTML='❚❚ Pause';timer=setInterval(function(){i=(i+1)%keys.length;show(keys[i]);},reduced?2200:1700);}
+  root.querySelectorAll('[data-t]').forEach(function(b){if(b.dataset.t!=='play')b.onclick=function(){stop();show(b.dataset.t);};});
+  playBtn.onclick=function(){timer?stop():start();};
+  show('(default)');
+  if('IntersectionObserver' in window){var seen=false;new IntersectionObserver(function(es,ob){es.forEach(function(e){if(e.isIntersecting&&!seen){seen=true;setTimeout(start,500);ob.disconnect();}});},{threshold:0.4}).observe(root);}
+})();
 </script>
 <script type="module">
   try{
