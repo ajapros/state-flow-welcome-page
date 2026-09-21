@@ -237,6 +237,7 @@ section{padding:80px 0}
     <a href="#features">Features</a>
     <a href="#conventions">Conventions</a>
     <a href="#trajectories">Trajectories</a>
+    <a href="#advanced">Advanced</a>
     <a href="#diagrams">Diagrams</a>
     <a href="#cli">CLI</a>
     <a class="nav-cta" href="https://github.com/rajakolluru">GitHub ↗</a>
@@ -550,6 +551,62 @@ stateDiagram-v2
   In the full Chenile framework a trajectory also swaps the <b>service implementation</b> (<code>@ConditionalOnTrajectory</code>) and returns different <b>configuration</b> values — read the <a href="https://chenile.org/concepts/14-trajectories/">Trajectories chapter on chenile.org</a>.</div>
 </div></section>
 
+<section id="advanced"><div class="wrap">
+  <div class="section-head">
+    <span class="eyebrow">Advanced workflow features</span>
+    <h2>More than states and transitions</h2>
+    <p class="lead">Real business workflows need checklists, feature toggles, permissions, introspection and their own vocabulary. Finito builds all of these into the same declarative flow.</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="ic">✅</div>
+      <h3>Activities &amp; completion checks</h3>
+      <p>Tag transitions as <b>mandatory</b> or <b>optional</b> activities (<code>meta-activity="MANDATORY"</code>). An automatic <em>activity-checker</em> state (e.g. <code>AreClosedActivitiesComplete</code>) blocks progress until every mandatory activity for a status is done — so a workflow can't advance with work outstanding.</p>
+    </div>
+    <div class="card">
+      <div class="ic">🎚️</div>
+      <h3>Enablement</h3>
+      <p>Attach an <code>enablement-strategy</code> (e.g. a config-based one) to switch transitions on and off <b>by configuration</b> — feature flags for your workflow, per module, tenant or deployment, without touching the XML.</p>
+    </div>
+    <div class="card">
+      <div class="ic">🔐</div>
+      <h3>Security on transitions</h3>
+      <p>Add a <code>security-strategy</code> and attach <code>meta-acls</code> permissions to individual events. The permission is checked before the action runs — authorization lives in the flow, next to the transition it guards.</p>
+    </div>
+    <div class="card">
+      <div class="ic">🔎</div>
+      <h3>Runtime introspection</h3>
+      <p>Generated workflow services expose an admin info API under <code>/{service}/info/…</code> — render the live state diagram, list the allowed actions for an entity, return the workflow as JSON, and fetch generated test cases.</p>
+    </div>
+    <div class="card">
+      <div class="ic">🧬</div>
+      <h3>Extend the DSL</h3>
+      <p>Define your own vocabulary with <code>add-state-tag</code> / <code>add-transition-tag</code>. A custom <code>&lt;status&gt;</code> or <code>&lt;on-action&gt;</code> tag expands into the underlying states and transitions — so flows read in <em>your</em> domain language.</p>
+    </div>
+    <div class="card">
+      <div class="ic">⏱️</div>
+      <h3>SLA &amp; timing</h3>
+      <p>Entry actions stamp state-entry time and compute SLA fields (late / getting-late) from the flow metadata, so dashboards and escalations have the timing data they need without extra code.</p>
+    </div>
+  </div>
+
+  <div class="codewrap" style="margin-top:26px">
+    <div class="bar"><i class="dotr"></i> a custom DSL — states.xml (excerpt)</div>
+<pre><code><span class="tok-cm">&lt;!-- define the vocabulary once… --&gt;</span>
+<span class="tok-tag">&lt;add-state-tag</span> <span class="tok-attr">tag</span>=<span class="tok-str">"status"</span> <span class="tok-attr">manualState</span>=<span class="tok-str">"true"</span><span class="tok-tag">/&gt;</span>
+<span class="tok-tag">&lt;add-transition-tag</span> <span class="tok-attr">tag</span>=<span class="tok-str">"on-action"</span> <span class="tok-attr">eventIdTag</span>=<span class="tok-str">"id"</span> <span class="tok-attr">newStateIdTag</span>=<span class="tok-str">"move-to"</span><span class="tok-tag">/&gt;</span>
+<span class="tok-tag">&lt;add-transition-tag</span> <span class="tok-attr">tag</span>=<span class="tok-str">"mandatory-activity"</span> <span class="tok-attr">meta-activity</span>=<span class="tok-str">"MANDATORY"</span> <span class="tok-attr">eventIdTag</span>=<span class="tok-str">"id"</span><span class="tok-tag">/&gt;</span>
+
+<span class="tok-cm">&lt;!-- …then write the flow in your own words --&gt;</span>
+<span class="tok-tag">&lt;status</span> <span class="tok-attr">id</span>=<span class="tok-str">'OPENED'</span> <span class="tok-attr">initialState</span>=<span class="tok-str">'true'</span><span class="tok-tag">&gt;</span>
+  <span class="tok-tag">&lt;on-action</span> <span class="tok-attr">id</span>=<span class="tok-str">'assign'</span> <span class="tok-attr">move-to</span>=<span class="tok-str">'ASSIGNED'</span><span class="tok-tag">/&gt;</span>
+  <span class="tok-tag">&lt;mandatory-activity</span> <span class="tok-attr">id</span>=<span class="tok-str">'attachDocuments'</span><span class="tok-tag">/&gt;</span>
+<span class="tok-tag">&lt;/status&gt;</span></code></pre>
+  </div>
+  <p style="text-align:center;margin-top:22px;color:var(--muted);font-size:.9rem">These features are generated and wired by the <code>wfcustom</code> blueprint. In the full <a href="https://chenile.org">Chenile</a> framework they compose with security, multi-tenancy and messaging.</p>
+</div></section>
+
 <section id="blueprint"><div class="wrap">
   <div class="section-head">
     <span class="eyebrow">The blueprint · jgen</span>
@@ -651,6 +708,7 @@ stm-cli --render-tests-as-state returns-states.xml</code></pre>
         <li><a href="#features">Features</a></li>
         <li><a href="#conventions">Conventions</a></li>
         <li><a href="#trajectories">Trajectories</a></li>
+        <li><a href="#advanced">Advanced features</a></li>
         <li><a href="#diagrams">Auto diagrams</a></li>
         <li><a href="#cli">stm-cli</a></li>
       </ul></div>
