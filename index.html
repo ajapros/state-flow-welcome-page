@@ -238,6 +238,7 @@ section{padding:80px 0}
     <a href="#conventions">Conventions</a>
     <a href="#trajectories">Trajectories</a>
     <a href="#advanced">Advanced</a>
+    <a href="#runtime">Runtime</a>
     <a href="#diagrams">Diagrams</a>
     <a href="#cli">CLI</a>
     <a class="nav-cta" href="https://github.com/rajakolluru">GitHub ↗</a>
@@ -629,6 +630,84 @@ stateDiagram-v2
 </div></section>
 
 <!-- CLI -->
+<section class="bg-soft" id="runtime"><div class="wrap">
+  <div class="section-head">
+    <span class="eyebrow">Under the hood · workflow services</span>
+    <h2>One HTTP call, one transition — typed, convention-wired, persisted</h2>
+    <p class="lead">A generated workflow service exposes three verbs. Every event goes through the same generic engine; your code is found by name, gets a strongly typed payload, and the response tells the caller what it may do next.</p>
+  </div>
+
+  <div class="grid-2" style="align-items:start">
+    <div class="codewrap">
+      <div class="bar"><i class="dotr"></i> the workflow REST contract</div>
+<pre><code><span class="tok-cm">// create — starts in the initial state</span>
+POST  /returns                      { <span class="tok-str">"openedBy"</span>: <span class="tok-str">"USER1"</span> }
+<span class="tok-cm">// retrieve</span>
+GET   /returns/{id}
+<span class="tok-cm">// fire an event — the payload type depends on the event</span>
+PATCH /returns/{id}/approve         { <span class="tok-str">"comment"</span>: <span class="tok-str">"looks good"</span> }
+
+<span class="tok-cm">// every call answers with</span>
+{ <span class="tok-str">"payload"</span>: {
+    <span class="tok-str">"mutatedEntity"</span>: { …, <span class="tok-str">"currentState"</span>: { <span class="tok-str">"stateId"</span>: <span class="tok-str">"APPROVED"</span> } },
+    <span class="tok-str">"allowedActionsAndMetadata"</span>: [
+      { <span class="tok-str">"allowedAction"</span>: <span class="tok-str">"refund"</span>, <span class="tok-str">"acls"</span>: <span class="tok-str">"returns.refund"</span> },
+      { <span class="tok-str">"allowedAction"</span>: <span class="tok-str">"inspect"</span>, <span class="tok-str">"activity"</span>: <span class="tok-str">"MANDATORY"</span> } ] } }</code></pre>
+    </div>
+    <div>
+      <h3 style="margin-bottom:10px">What happens on <code>PATCH …/approve</code></h3>
+      <ol style="color:var(--slate);padding-left:20px;margin:0">
+        <li style="margin-bottom:7px"><code>StmBodyTypeSelector</code> picks the payload type — explicit <code>bodyType</code> metadata, or the second parameter of the action's <code>transitionTo(…)</code>.</li>
+        <li style="margin-bottom:7px">The STM fires the transition; <code>BaseTransitionAction</code> runs a metadata-named command or orchestration if there is one…</li>
+        <li style="margin-bottom:7px">…otherwise the resolver finds <code>returnsApproveAction</code> and runs your typed <code>AbstractSTMTransitionAction</code>.</li>
+        <li style="margin-bottom:7px">Secondary actions registered for <code>approve</code> (<code>SecondSTMTransitionAction</code>) run next, in order.</li>
+        <li style="margin-bottom:7px"><code>GenericEntryAction</code> stamps SLA timing, stores the entity, and calls the state's post-save hook.</li>
+        <li>The response lists the <b>allowed actions</b> for the new state — already filtered by state and security.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-top:30px">
+    <div class="card"><div class="ic">🏷️</div><h3>Metadata reaches the client</h3><p>Every <code>meta-*</code> attribute on a transition comes back on its allowed action with the prefix stripped — <code>meta-acls</code> → <code>acls</code>, <code>meta-label</code> → <code>label</code>. Build buttons from it; never hard-code events.</p></div>
+    <div class="card"><div class="ic">🔎</div><h3>Introspection endpoints</h3><p><code>/{svc}/info/state-diagram</code>, <code>allowed-actions?state=</code>, <code>json</code>, <code>test-cases</code>, <code>test-visualization</code> and <code>test-state-diagrams</code> expose the flow itself to consoles and tools.</p></div>
+    <div class="card"><div class="ic">🤖</div><h3>Agents and grids, too</h3><p>With <code>workflow-mcp</code>, AI agents see each event's payload variant (<code>ProcessIdPolymorph</code>). Workflow-backed Chenile queries return the same <code>allowedActions</code> per row.</p></div>
+  </div>
+
+  <div class="callout key" style="margin-top:26px"><div class="t">Go deeper</div>
+  The full convention table, every <code>stmcmds</code> class and the security wiring are on chenile.org: <a href="https://chenile.org/developer/workflow-internals/">workflow service internals</a>.</div>
+</div></section>
+<section id="processes"><div class="wrap">
+  <div class="section-head">
+    <span class="eyebrow">Built on Finito</span>
+    <h2>Long-running processes are a Finito flow, too</h2>
+    <p class="lead">Chenile Process Management orchestrates tree-shaped batch work — split a job, run the pieces, aggregate the results, chain the next job — and the orchestrator itself is a Finito state machine. Processes are rows in your database; workers raise events back into the flow.</p>
+  </div>
+
+  <div class="grid-2" style="align-items:start">
+    <div class="codewrap">
+      <div class="bar"><i class="dotr"></i> process-states.xml — the flow</div>
+<pre><code>isThisLeafNode ── leaf ──────▶ EXECUTING ── doneSuccessfully ──▶ PROCESSED
+       │                          └─ doneWithErrors ──▶ PROCESSED_WITH_ERRORS
+       └─ non-leaf ─▶ SPLIT_PENDING ── splitDone ─▶ SUB_PROCESSES_PENDING
+SUB_PROCESSES_PENDING ── child done ─▶ areAllSubProcessesDone?
+   <span class="tok-cm">numSubProcesses == numCompletedSubProcesses &amp;&amp; splitCompleted</span>
+          ─▶ AGGREGATION_PENDING ── aggregationDone ─▶ areThereErrors?
+                                        ─▶ PROCESSED | PROCESSED_WITH_ERRORS</code></pre>
+    </div>
+    <div>
+      <h3 style="margin-bottom:10px">What Finito gives the orchestrator</h3>
+      <ul style="color:var(--slate);padding-left:20px;margin:0">
+        <li style="margin-bottom:9px"><b>Decision states</b> (<code>isThisLeafNode</code>, <code>areAllSubProcessesDone</code>, <code>areThereErrors</code>) keep the coordination rules in the flow, not in code.</li>
+        <li style="margin-bottom:9px"><b>Entry actions</b> launch the right worker — splitter, executor or aggregator — in-VM, over a queue, or from a durable JDBC work queue.</li>
+        <li style="margin-bottom:9px">An optional <b>transactional outbox</b> commits each transition's consequences with the state change itself.</li>
+        <li>Triggers (Quartz crontabs), completion chaining, a management API and a React dashboard come with it — new in Chenile 2.1.31.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:26px"><div class="t">Read more on chenile.org</div>
+  <a href="https://chenile.org/developer/process-management/">Process management</a> · <a href="https://chenile.org/developer/process-outbox/">durable outbox</a> · <a href="https://chenile.org/developer/process-admin/">administration &amp; dashboard</a> · <a href="https://chenile.org/developer/process-vs-temporal/">vs. Temporal</a></div>
+</div></section>
 <section class="bg-soft" id="cli"><div class="wrap">
   <div class="section-head">
     <span class="eyebrow">stm-cli</span>
@@ -709,6 +788,8 @@ stm-cli --render-tests-as-state returns-states.xml</code></pre>
         <li><a href="#conventions">Conventions</a></li>
         <li><a href="#trajectories">Trajectories</a></li>
         <li><a href="#advanced">Advanced features</a></li>
+        <li><a href="#runtime">Workflow runtime</a></li>
+        <li><a href="#processes">Long-running processes</a></li>
         <li><a href="#diagrams">Auto diagrams</a></li>
         <li><a href="#cli">stm-cli</a></li>
       </ul></div>
